@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Private Player</title>
+    <style>
+        body { background: #121212; color: white; font-family: sans-serif; text-align: center; }
+        .player-container { margin-top: 50px; }
+        audio { filter: invert(100%); width: 300px; }
+        .track-list { list-style: none; padding: 0; }
+        .track-list li { padding: 10px; cursor: pointer; border-bottom: 1px solid #333; }
+        .track-list li:hover { background: #1db954; }
+    </style>
+</head>
+<body>
+    <h1>Наша Группа</h1>
+    <div class="player-container">
+        <audio id="main-player" controls src="music/track1.mp3"></audio>
+        <ul class="track-list">
+            <li onclick="playTrack('music/track1.mp3')">Название трека 1</li>
+            <li onclick="playTrack('music/track2.mp3')">Название трека 2</li>
+        </ul>
+    </div>
+    <script>
+        function playTrack(url) {
+            const player = document.getElementById('main-player');
+            player.src = url;
+            player.play();
+        }
+    </script>
+</body>
+</html>
