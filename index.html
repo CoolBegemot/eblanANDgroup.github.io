@@ -2,31 +2,160 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Private Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBLAN AND GROUP | Private Space</title>
     <style>
-        body { background: #121212; color: white; font-family: sans-serif; text-align: center; }
-        .player-container { margin-top: 50px; }
-        audio { filter: invert(100%); width: 300px; }
-        .track-list { list-style: none; padding: 0; }
-        .track-list li { padding: 10px; cursor: pointer; border-bottom: 1px solid #333; }
-        .track-list li:hover { background: #1db954; }
+        :root {
+            --primary-color: #1db954; /* Зеленый акцент как у Spotify */
+            --bg-color: #121212;
+            --card-bg: #181818;
+            --text-main: #ffffff;
+            --text-dim: #b3b3b3;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        /* Стилизация аудио-плеера */
+        audio {
+            width: 100%;
+            height: 40px;
+            margin-bottom: 25px;
+            filter: invert(90%) hue-rotate(100deg) brightness(1.2); /* Красим под стиль */
+        }
+
+        .playlist {
+            text-align: left;
+            list-style: none;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .track {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: #222;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .track:hover {
+            background: #2a2a2a;
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .track.active {
+            background: #2a2a2a;
+            border-color: var(--primary-color);
+        }
+
+        .track-info {
+            flex-grow: 1;
+        }
+
+        .track-name {
+            display: block;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .track-artist {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .play-icon {
+            color: var(--primary-color);
+            margin-right: 15px;
+        }
+
+        /* Скроллбар */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
 <body>
-    <h1>Наша Группа</h1>
-    <div class="player-container">
-        <audio id="main-player" controls src="music/track1.mp3"></audio>
-        <ul class="track-list">
-            <li onclick="playTrack('music/track1.mp3')">Название трека 1</li>
-            <li onclick="playTrack('music/track2.mp3')">Название трека 2</li>
-        </ul>
+
+<div class="container">
+    <h1>EBLAN AND GROUP</h1>
+    <p class="subtitle">Только для своих. 6 человек.</p>
+
+    <audio id="player" controls>
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    <div class="playlist" id="playlist">
+        <div class="track" onclick="playSong(this, 'music/track1.mp3')">
+            <span class="play-icon">▶</span>
+            <div class="track-info">
+                <span class="track-name">Первый Трек</span>
+                <span class="track-artist">Наша Группа</span>
+            </div>
+        </div>
+
+        <div class="track" onclick="playSong(this, 'music/track2.mp3')">
+            <span class="play-icon">▶</span>
+            <div class="track-info">
+                <span class="track-name">Второй Трек</span>
+                <span class="track-artist">Наша Группа</span>
+            </div>
+        </div>
     </div>
-    <script>
-        function playTrack(url) {
-            const player = document.getElementById('main-player');
-            player.src = url;
-            player.play();
-        }
-    </script>
+</div>
+
+<script>
+    const player = document.getElementById('player');
+    
+    function playSong(element, url) {
+        // Убираем активный класс у всех
+        document.querySelectorAll('.track').forEach(t => t.classList.remove('active'));
+        
+        // Добавляем активный класс нажатому
+        element.classList.add('active');
+        
+        // Запускаем музыку
+        player.src = url;
+        player.play();
+    }
+
+    // Автопереход на следующий трек можно добавить позже
+</script>
+
 </body>
 </html>
