@@ -81,61 +81,57 @@
     </div>
     
     <div style="flex-grow: 1; max-width: 500px; text-align: center;">
-        <audio id="audio"></audio>
+        <audio id="audio" ontimeupdate="updateProgress()"></audio>
         <button class="play-btn" onclick="togglePlay()" id="btn">▶</button>
-        <input type="range" id="progress" value="0" style="width: 100%; margin-top: 8px;">
+        <input type="range" id="progress" value="0" min="0" max="100" oninput="seek()">
     </div>
 
     <div style="width: 250px; text-align: right;">
-        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.7" style="width: 100px;">
+        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.7" style="width: 100px;" oninput="setVolume()">
     </div>
 </footer>
 
 <script>
+    // Поле 's' должно СТРОГО совпадать с названием файла в репозитории GitHub
     const library = [
-        {t: "Лесник", a: "Король и Шут", g: "Король и шут"},
-        {t: "Прыгну со скалы", a: "Король и Шут", g: "Король и шут"},
-        {t: "Demo Track", a: "User", g: "Авторские"},
-        {t: "Last Christmas", a: "Wham!", g: "Новогодняя"},
-        {t: "Painkiller", a: "Judas Priest", g: "Металл"}
+        {t: "NO LOCKDOWN", a: "Ms Fish ft Kizaru", g: "Авторские", s: "Ms Fish ft Kizaru - NO LOCKDOWN.mp3"},
+        {t: "Лесник", a: "Король и Шут", g: "Король и шут", s: "lesnik.mp3"},
+        {t: "Прыгну со скалы", a: "Король и Шут", g: "Король и шут", s: "skala.mp3"},
+        {t: "Last Christmas", a: "Wham!", g: "Новогодняя", s: "christmas.mp3"},
+        {t: "Painkiller", a: "Judas Priest", g: "Металл", s: "painkiller.mp3"}
     ];
 
-    // Синтезатор звука (Web Audio API) — гарантирует отсутствие криков
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audio = document.getElementById('audio');
 
     function playTone(freq, type = 'sine', duration = 0.2) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        
         osc.type = type;
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-        
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        
         osc.start();
         osc.stop(audioCtx.currentTime + duration);
     }
 
     const genreEffects = {
-        'Король и шут': () => playTone(150, 'triangle', 0.4), // Низкий мистический тон
-        'Авторские': () => playTone(440, 'sine', 0.2),       // Чистая нота Ля
-        'Новогодняя': () => { playTone(880, 'sine', 0.1); setTimeout(() => playTone(1200, 'sine', 0.1), 100); }, // Динь-динь
-        'Металл': () => playTone(200, 'sawtooth', 0.1)      // Резкий "металлический" звук
+        'Король и шут': () => playTone(150, 'triangle', 0.4),
+        'Авторские': () => playTone(440, 'sine', 0.2),
+        'Новогодняя': () => { playTone(880, 'sine', 0.1); setTimeout(() => playTone(1200, 'sine', 0.1), 100); },
+        'Металл': () => playTone(200, 'sawtooth', 0.1)
     };
 
     function selectGenre(genre) {
         if(genreEffects[genre]) genreEffects[genre]();
-
         document.getElementById('header').innerText = genre;
         const tracks = library.filter(x => x.g === genre);
         
         document.getElementById('grid').innerHTML = tracks.map(x => `
-            <div class="track-card" onclick="play('${x.t}', '${x.a}')">
+            <div class="track-card" onclick="playTrack('${x.t}', '${x.a}', '${x.s}')">
                 <div class="cover-stub">🎵</div>
                 <b>${x.t}</b><br><small style="color: #666">${x.a}</small>
             </div>
@@ -146,16 +142,23 @@
         });
     }
 
-    function play(t, a) {
-        document.getElementById('p-title').innerText = t;
-        document.getElementById('p-artist').innerText = a;
-        document.getElementById('btn').innerText = '⏸';
+    function playTrack(title, artist, filename) {
+        document.getElementById('p-title').innerText = title;
+        document.getElementById('p-artist').innerText = artist;
+        
+        // Ключевой момент: подставляем название файла
+        audio.src = filename;
+        audio.play().then(() => {
+            document.getElementById('btn').innerText = '⏸';
+        }).catch(e => {
+            alert("Ошибка: файл " + filename + " не найден в репозитории.");
+        });
     }
 
     function togglePlay() {
-        const audio = document.getElementById('audio');
+        if(!audio.src) return;
         if(audio.paused) { 
-            audio.play().catch(() => {}); 
+            audio.play(); 
             document.getElementById('btn').innerText = '⏸'; 
         } else { 
             audio.pause(); 
@@ -163,9 +166,23 @@
         }
     }
 
-    document.getElementById('volume').oninput = (e) => document.getElementById('audio').volume = e.target.value;
+    function updateProgress() {
+        const progress = document.getElementById('progress');
+        if(audio.duration) {
+            progress.value = (audio.currentTime / audio.duration) * 100;
+        }
+    }
 
-    window.onload = () => selectGenre('Король и шут');
+    function seek() {
+        const progress = document.getElementById('progress');
+        audio.currentTime = (progress.value / 100) * audio.duration;
+    }
+
+    function setVolume() {
+        audio.volume = document.getElementById('volume').value;
+    }
+
+    window.onload = () => selectGenre('Авторские');
 </script>
 </body>
 </html>
