@@ -2,160 +2,170 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EBLAN AND GROUP | Private Space</title>
+    <title>Golden Music Hub 2026</title>
     <style>
         :root {
-            --primary-color: #1db954; /* Зеленый акцент как у Spotify */
-            --bg-color: #121212;
-            --card-bg: #181818;
-            --text-main: #ffffff;
-            --text-dim: #b3b3b3;
+            --bg: #0a0a0a;
+            --side: #121212;
+            --text: #e0e0e0;
+            --accent: #bf9b30; /* Золото */
+            --card: #1c1c1c;
+            --player: #050505;
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        body { 
+            background: var(--bg); color: var(--text); 
+            font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; 
+            overflow: hidden;
         }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
-            text-align: center;
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--side); padding: 25px; border-right: 1px solid #222; display: flex; flex-direction: column; }
+        .logo { font-size: 22px; font-weight: bold; color: var(--accent); margin-bottom: 40px; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
+        
+        .menu-item { 
+            cursor: pointer; padding: 14px; border-radius: 8px; margin-bottom: 10px; 
+            transition: 0.3s; border: 1px solid transparent; color: #aaa;
+        }
+        .menu-item:hover { color: var(--accent); background: rgba(191, 155, 48, 0.05); }
+        .menu-item.active { background: var(--accent); color: #000; font-weight: bold; }
+
+        /* Content */
+        .main-view { flex-grow: 1; padding: 40px; overflow-y: auto; }
+        .track-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        
+        .track-card { 
+            background: var(--card); padding: 20px; border-radius: 12px; 
+            transition: 0.3s; cursor: pointer; border: 1px solid #222;
+        }
+        .track-card:hover { border-color: var(--accent); transform: scale(1.02); }
+        .cover-stub { 
+            height: 140px; background: linear-gradient(135deg, #111, #333); 
+            border-radius: 8px; margin-bottom: 15px; display: flex; 
+            align-items: center; justify-content: center; font-size: 40px;
         }
 
-        h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-            letter-spacing: -1px;
+        /* Player */
+        .player-bar { 
+            position: fixed; bottom: 0; width: 100%; background: var(--player); 
+            border-top: 2px solid var(--accent); padding: 15px 40px; 
+            display: flex; align-items: center; justify-content: space-between; box-sizing: border-box;
         }
-
-        p.subtitle {
-            color: var(--text-dim);
-            margin-bottom: 30px;
-            font-size: 14px;
+        
+        .play-btn { 
+            background: var(--accent); color: #000; border-radius: 50%; 
+            width: 45px; height: 45px; border: none; cursor: pointer; font-size: 20px;
         }
-
-        /* Стилизация аудио-плеера */
-        audio {
-            width: 100%;
-            height: 40px;
-            margin-bottom: 25px;
-            filter: invert(90%) hue-rotate(100deg) brightness(1.2); /* Красим под стиль */
-        }
-
-        .playlist {
-            text-align: left;
-            list-style: none;
-            padding: 0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .track {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background: #222;
-            margin-bottom: 8px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-        }
-
-        .track:hover {
-            background: #2a2a2a;
-            border-color: var(--primary-color);
-            transform: translateX(5px);
-        }
-
-        .track.active {
-            background: #2a2a2a;
-            border-color: var(--primary-color);
-        }
-
-        .track-info {
-            flex-grow: 1;
-        }
-
-        .track-name {
-            display: block;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .track-artist {
-            font-size: 12px;
-            color: var(--text-dim);
-        }
-
-        .play-icon {
-            color: var(--primary-color);
-            margin-right: 15px;
-        }
-
-        /* Скроллбар */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>EBLAN AND GROUP</h1>
-    <p class="subtitle">Только для своих. 6 человек.</p>
+<aside class="sidebar">
+    <div class="logo">EBLAN AND GROUP</div>
+    <div class="menu-item" onclick="selectGenre('Король и шут')">Король и шут</div>
+    <div class="menu-item" onclick="selectGenre('Авторские')">Авторские</div>
+    <div class="menu-item" onclick="selectGenre('Новогодняя')">Новогодняя</div>
+    <div class="menu-item" onclick="selectGenre('Металл')">Металл</div>
+</aside>
 
-    <audio id="player" controls>
-        Ваш браузер не поддерживает аудио.
-    </audio>
+<main class="main-view">
+    <h1 id="header" style="color: var(--accent)">Плейлист</h1>
+    <div class="track-grid" id="grid"></div>
+</main>
 
-    <div class="playlist" id="playlist">
-        <div class="track" onclick="playSong(this, 'music/track1.mp3')">
-            <span class="play-icon">▶</span>
-            <div class="track-info">
-                <span class="track-name">Первый Трек</span>
-                <span class="track-artist">Наша Группа</span>
-            </div>
-        </div>
-
-        <div class="track" onclick="playSong(this, 'music/track2.mp3')">
-            <span class="play-icon">▶</span>
-            <div class="track-info">
-                <span class="track-name">Второй Трек</span>
-                <span class="track-artist">Наша Группа</span>
-            </div>
-        </div>
+<footer class="player-bar">
+    <div style="width: 250px">
+        <b id="p-title" style="color: var(--accent)">Трек не выбран</b><br>
+        <small id="p-artist">Исполнитель</small>
     </div>
-</div>
+    
+    <div style="flex-grow: 1; max-width: 500px; text-align: center;">
+        <audio id="audio"></audio>
+        <button class="play-btn" onclick="togglePlay()" id="btn">▶</button>
+        <input type="range" id="progress" value="0" style="width: 100%; margin-top: 8px;">
+    </div>
+
+    <div style="width: 250px; text-align: right;">
+        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.7" style="width: 100px;">
+    </div>
+</footer>
 
 <script>
-    const player = document.getElementById('player');
-    
-    function playSong(element, url) {
-        // Убираем активный класс у всех
-        document.querySelectorAll('.track').forEach(t => t.classList.remove('active'));
+    const library = [
+        {t: "Лесник", a: "Король и Шут", g: "Король и шут"},
+        {t: "Прыгну со скалы", a: "Король и Шут", g: "Король и шут"},
+        {t: "Demo Track", a: "User", g: "Авторские"},
+        {t: "Last Christmas", a: "Wham!", g: "Новогодняя"},
+        {t: "Painkiller", a: "Judas Priest", g: "Металл"}
+    ];
+
+    // Синтезатор звука (Web Audio API) — гарантирует отсутствие криков
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(freq, type = 'sine', duration = 0.2) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         
-        // Добавляем активный класс нажатому
-        element.classList.add('active');
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
         
-        // Запускаем музыку
-        player.src = url;
-        player.play();
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
     }
 
-    // Автопереход на следующий трек можно добавить позже
-</script>
+    const genreEffects = {
+        'Король и шут': () => playTone(150, 'triangle', 0.4), // Низкий мистический тон
+        'Авторские': () => playTone(440, 'sine', 0.2),       // Чистая нота Ля
+        'Новогодняя': () => { playTone(880, 'sine', 0.1); setTimeout(() => playTone(1200, 'sine', 0.1), 100); }, // Динь-динь
+        'Металл': () => playTone(200, 'sawtooth', 0.1)      // Резкий "металлический" звук
+    };
 
+    function selectGenre(genre) {
+        if(genreEffects[genre]) genreEffects[genre]();
+
+        document.getElementById('header').innerText = genre;
+        const tracks = library.filter(x => x.g === genre);
+        
+        document.getElementById('grid').innerHTML = tracks.map(x => `
+            <div class="track-card" onclick="play('${x.t}', '${x.a}')">
+                <div class="cover-stub">🎵</div>
+                <b>${x.t}</b><br><small style="color: #666">${x.a}</small>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.menu-item').forEach(el => {
+            el.classList.toggle('active', el.innerText === genre);
+        });
+    }
+
+    function play(t, a) {
+        document.getElementById('p-title').innerText = t;
+        document.getElementById('p-artist').innerText = a;
+        document.getElementById('btn').innerText = '⏸';
+    }
+
+    function togglePlay() {
+        const audio = document.getElementById('audio');
+        if(audio.paused) { 
+            audio.play().catch(() => {}); 
+            document.getElementById('btn').innerText = '⏸'; 
+        } else { 
+            audio.pause(); 
+            document.getElementById('btn').innerText = '▶'; 
+        }
+    }
+
+    document.getElementById('volume').oninput = (e) => document.getElementById('audio').volume = e.target.value;
+
+    window.onload = () => selectGenre('Король и шут');
+</script>
 </body>
 </html>
